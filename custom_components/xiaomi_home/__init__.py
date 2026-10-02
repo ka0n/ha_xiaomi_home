@@ -64,6 +64,7 @@ from .miot.const import (
 from .miot.miot_error import MIoTOauthError
 from .miot.miot_device import MIoTDevice
 from .miot.miot_client import MIoTClient, get_miot_instance_async
+from .services import async_setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
