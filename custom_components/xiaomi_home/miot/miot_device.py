@@ -86,7 +86,7 @@ from .specs.specv2entity import (
     SPEC_SERVICE_TRANS_MAP
 )
 from .common import slugify_name, slugify_did
-from .const import DOMAIN
+from .const import DATA_ACTION_ENTITIES, DOMAIN
 from .miot_client import MIoTClient
 from .miot_error import MIoTClientError, MIoTDeviceError
 from .miot_mips import MIoTDeviceState
