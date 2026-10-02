@@ -1606,6 +1606,12 @@ class MIoTActionEntity(Entity):
                 aiid=self.spec.iid,
                 in_list=in_list or [])
             self._attr_extra_state_attributes['action output'] = result
+            if self.spec.out:
+                action_out = ', '.join([
+                    f'{prop.description_trans}({prop.format_.__name__})'
+                    for prop in self.spec.out])
+                self._attr_extra_state_attributes[
+                    'action output format'] = f'[{action_out}]'
             self.async_write_ha_state()
             return result
         except MIoTClientError as e:
