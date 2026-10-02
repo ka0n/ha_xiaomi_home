@@ -170,6 +170,8 @@ The "Attribute" item in the entity details page displays the format of the input
 
 For example, the "Attributes" item in the details page of the Notify entity converted by the "Intelligent Speaker Execute Text Directive" action of xiaomi.wifispeaker.s12 siid=5, aiid=5 instance shows the action params as `[Text Content(str), Silent Execution(bool)]`. A properly formatted input is `["Hello", true]`.
 
+If an action returns output parameters, the latest ordered response is exposed in the entity attributes as `action output`. The corresponding ordered output specification is exposed as `action output format`, using the translated MIoT property description and value type. These attributes are updated whenever the action is executed.
+
 ### Specific Conversion
 
 MIoT-Spec-V2 uses URN for defining types. The format is `urn:<namespace>:<type>:<name>:<value>[:<vendor-product>:<version>]`, in which `name` is a human-readable word or phrase describing the instance of device, service, property, event and action. Xiaomi Home Integration first determines whether to convert the MIoT-Spec-V2 instance into a specific Home Assistant entity based on the instance's name. For the instance that does not meet the specific conversion rules, general conversion rules are used for conversion.
