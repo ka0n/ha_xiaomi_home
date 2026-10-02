@@ -123,7 +123,7 @@ class Notify(MIoTActionEntity, NotifyEntity):
             return
         try:
             in_value = format_action_params(self.spec, in_list)
-        except ValueError as err:
+        except ValueError:
             _LOGGER.error(
                 'action exec failed, %s(%s), invalid action params, %s',
                 self.name, self.entity_id, message)
