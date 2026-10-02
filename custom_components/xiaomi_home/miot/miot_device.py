@@ -1575,6 +1575,7 @@ class MIoTActionEntity(Entity):
             f'{"* "if self.spec.proprietary else " "}'
             f'{self.service.description_trans} {spec.description_trans}')
         self._attr_available = miot_device.online
+        self._attr_extra_state_attributes = {}
 
         _LOGGER.debug(
             'new miot action entity, %s, %s, %s, %s, %s',
@@ -1599,11 +1600,14 @@ class MIoTActionEntity(Entity):
         self, in_list: Optional[list] = None
     ) -> Optional[list]:
         try:
-            return await self.miot_device.miot_client.action_async(
+            result = await self.miot_device.miot_client.action_async(
                 did=self.miot_device.did,
                 siid=self.service.iid,
                 aiid=self.spec.iid,
                 in_list=in_list or [])
+            self._attr_extra_state_attributes['action output'] = result
+            self.async_write_ha_state()
+            return result
         except MIoTClientError as e:
             raise RuntimeError(f'{e}, {self.entity_id}, {self.name}') from e
 
