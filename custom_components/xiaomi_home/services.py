@@ -2,8 +2,6 @@
 """Response-capable Xiaomi Home services."""
 from __future__ import annotations
 
-from typing import Any
-
 import voluptuous as vol
 
 from homeassistant.const import ATTR_ENTITY_ID
