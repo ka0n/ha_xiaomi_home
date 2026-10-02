@@ -11,10 +11,9 @@ from homeassistant.core import (
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.entity_platform import DATA_DOMAIN_PLATFORM_ENTITIES
 from homeassistant.helpers.service import batched_entity_service_call
 
-from .miot.const import DOMAIN
+from .miot.const import DATA_ACTION_ENTITIES, DOMAIN
 from .miot.miot_device import MIoTActionEntity
 
 SERVICE_EXECUTE_ACTION = 'execute_action'
@@ -27,15 +26,7 @@ SERVICE_EXECUTE_ACTION_SCHEMA = cv.make_entity_service_schema({
 
 def _get_loaded_action_entities(hass: HomeAssistant) -> dict[str, Entity]:
     """Return loaded Xiaomi Home MIoT action entities."""
-    platform_entities = hass.data.get(DATA_DOMAIN_PLATFORM_ENTITIES, {})
-    entities: dict[str, Entity] = {}
-    for entity_domain in ('button', 'notify', 'text'):
-        entities.update(platform_entities.get((entity_domain, DOMAIN), {}))
-    return {
-        entity_id: entity
-        for entity_id, entity in entities.items()
-        if isinstance(entity, MIoTActionEntity)
-    }
+    return hass.data[DOMAIN][DATA_ACTION_ENTITIES]
 
 
 async def _async_execute_action(
