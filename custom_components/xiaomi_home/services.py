@@ -6,7 +6,6 @@ from functools import partial
 
 import voluptuous as vol
 
-from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import (
     EntityServiceResponse, HomeAssistant, ServiceCall, SupportsResponse)
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
@@ -21,8 +20,7 @@ from .miot.miot_device import MIoTActionEntity
 SERVICE_EXECUTE_ACTION = 'execute_action'
 ATTR_PARAMS = 'params'
 
-SERVICE_EXECUTE_ACTION_SCHEMA = vol.Schema({
-    vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
+SERVICE_EXECUTE_ACTION_SCHEMA = cv.make_entity_service_schema({
     vol.Optional(ATTR_PARAMS, default=[]): list,
 })
 
@@ -65,16 +63,20 @@ async def _async_execute_action(
         return {}
 
     return {
-        'output': [
-            {
-                'piid': prop.iid,
-                'name': prop.name,
-                'format': prop.format_.__name__,
-                'value': raw_output[index] if index < len(raw_output) else None,
-            }
-            for index, prop in enumerate(entity.spec.out)
-        ],
-        'raw_output': raw_output,
+        entity.entity_id: {
+            'output': [
+                {
+                    'piid': prop.iid,
+                    'name': prop.name,
+                    'format': prop.format_.__name__,
+                    'value': (
+                        raw_output[index]
+                        if index < len(raw_output) else None),
+                }
+                for index, prop in enumerate(entity.spec.out)
+            ],
+            'raw_output': raw_output,
+        }
     }
 
 
