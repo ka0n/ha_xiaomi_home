@@ -21,6 +21,7 @@ from custom_components.xiaomi_home.services import (
     SERVICE_EXECUTE_ACTION,
     async_setup_services,
 )
+from custom_components.xiaomi_home.text import ActionText
 
 
 class MockActionEntity(MIoTActionEntity):
@@ -293,3 +294,18 @@ async def test_loaded_registry_lifecycle(hass: HomeAssistant) -> None:
 
     assert hass.data[DOMAIN][DATA_ACTION_ENTITIES] == {}
     entity.miot_device.unsub_device_state.assert_called_once()
+
+
+async def test_action_text_updates_state_on_empty_output() -> None:
+    """A successful ActionText call writes state even with empty output."""
+    entity = ActionText.__new__(ActionText)
+    entity.entity_id = "text.empty_action"
+    entity.spec = SimpleNamespace(in_=[])
+    entity.async_execute = AsyncMock(return_value=[])
+    entity.async_write_ha_state = Mock()
+
+    await entity.async_set_value("[]")
+
+    entity.async_execute.assert_awaited_once_with([])
+    assert entity.native_value == "[]"
+    entity.async_write_ha_state.assert_called_once_with()
