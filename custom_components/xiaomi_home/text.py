@@ -139,7 +139,7 @@ class ActionText(MIoTActionEntity, TextEntity):
                 f'action exec failed, {self.name}({self.entity_id}), '
                 f'invalid action params, {value}')
         try:
-            await self.async_execute(in_list)
+            result = await self.async_execute(in_list)
         except ValueError as e:
             _LOGGER.error(
                 'action exec failed, %s(%s), invalid action params, %s',
@@ -149,4 +149,5 @@ class ActionText(MIoTActionEntity, TextEntity):
                 f'invalid action params, {value}') from e
 
         self._attr_native_value = value
-        self.async_write_ha_state()
+        if result:
+            self.async_write_ha_state()
