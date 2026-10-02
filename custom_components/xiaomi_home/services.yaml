@@ -6,7 +6,6 @@ execute_action:
         - button
         - notify
         - text
-      multiple: false
   fields:
     params:
       required: false
