@@ -15,7 +15,8 @@ def test_async_setup_registers_services() -> None:
 
     async_setup = next(
         node for node in tree.body
-        if isinstance(node, ast.AsyncFunctionDef) and node.name == 'async_setup')
+        if isinstance(node, ast.AsyncFunctionDef)
+        and node.name == 'async_setup')
 
     calls = [
         node for node in ast.walk(async_setup)
