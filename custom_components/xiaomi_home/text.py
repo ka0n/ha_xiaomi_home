@@ -109,7 +109,6 @@ class ActionText(MIoTActionEntity, TextEntity):
 
     def __init__(self, miot_device: MIoTDevice, spec: MIoTSpecAction) -> None:
         super().__init__(miot_device=miot_device, spec=spec)
-        self._attr_extra_state_attributes = {}
         self._attr_native_value = ''
         action_in: str = ', '.join([
             f'{prop.description_trans}({prop.format_.__name__})'
