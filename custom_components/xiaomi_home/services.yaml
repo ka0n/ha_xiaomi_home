@@ -1,0 +1,12 @@
+execute_action:
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          integration: xiaomi_home
+    params:
+      required: false
+      default: []
+      selector:
+        object:
