@@ -47,4 +47,4 @@ jobs:
 
       - name: Run Home Assistant runtime tests
         run: |
-          pytest -v -s ./ha_tests/
+          PYTHONPATH=. pytest -v -s ./ha_tests/
