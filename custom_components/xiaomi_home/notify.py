@@ -88,7 +88,6 @@ class Notify(MIoTActionEntity, NotifyEntity):
     def __init__(self, miot_device: MIoTDevice, spec: MIoTSpecAction) -> None:
         """Initialize the Notify."""
         super().__init__(miot_device=miot_device, spec=spec)
-        self._attr_extra_state_attributes = {}
         action_in: str = ', '.join([
             f'{prop.description_trans}({prop.format_.__name__})'
             for prop in self.spec.in_])
