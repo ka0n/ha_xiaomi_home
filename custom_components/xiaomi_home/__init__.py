@@ -60,7 +60,8 @@ from .miot.miot_storage import (
 from .miot.miot_spec import (
     MIoTSpecInstance, MIoTSpecParser, MIoTSpecService)
 from .miot.const import (
-    DEFAULT_INTEGRATION_LANGUAGE, DOMAIN, SUPPORTED_PLATFORMS)
+    DATA_ACTION_ENTITIES, DEFAULT_INTEGRATION_LANGUAGE, DOMAIN,
+    SUPPORTED_PLATFORMS)
 from .miot.miot_error import MIoTOauthError
 from .miot.miot_device import MIoTDevice
 from .miot.miot_client import MIoTClient, get_miot_instance_async
@@ -78,6 +79,8 @@ async def async_setup(hass: HomeAssistant, hass_config: dict) -> bool:
     hass.data[DOMAIN].setdefault('miot_clients', {})
     # {[entry_id:str]: list[MIoTDevice]}
     hass.data[DOMAIN].setdefault('devices', {})
+    # {entity_id: loaded MIoTActionEntity}
+    hass.data[DOMAIN].setdefault(DATA_ACTION_ENTITIES, {})
     # {[entry_id:str]: entities}
     hass.data[DOMAIN].setdefault('entities', {})
     for platform in SUPPORTED_PLATFORMS:
