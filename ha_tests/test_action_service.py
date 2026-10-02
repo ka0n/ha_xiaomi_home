@@ -1,4 +1,5 @@
 """Runtime tests for the Xiaomi Home MIoT action service."""
+# pylint: disable=redefined-outer-name
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -11,8 +12,6 @@ from homeassistant.exceptions import (
     ServiceValidationError,
     Unauthorized,
 )
-from homeassistant.helpers.entity import Entity
-
 from custom_components.xiaomi_home.miot.const import (
     DATA_ACTION_ENTITIES,
     DOMAIN,
@@ -47,7 +46,8 @@ class MockActionEntity(MIoTActionEntity):
             ],
         )
         self.service = SimpleNamespace(iid=3)
-        self.async_execute = AsyncMock(return_value=output if output is not None else [])
+        self.async_execute = AsyncMock(
+            return_value=output if output is not None else [])
 
 
 @pytest.fixture
@@ -272,7 +272,7 @@ async def test_parameter_and_client_errors_are_translated(
 
 
 async def test_loaded_registry_lifecycle(hass: HomeAssistant) -> None:
-    """MIoT action entities add and remove themselves from the runtime registry."""
+    """Check action entities add/remove themselves from the runtime registry."""
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][DATA_ACTION_ENTITIES] = {}
 
