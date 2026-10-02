@@ -1,5 +1,5 @@
 """Runtime tests for the Xiaomi Home MIoT action service."""
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,protected-access
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -255,7 +255,8 @@ async def test_real_parameter_validation_reaches_formatter(
         out=[],
     )
     entity.service = SimpleNamespace(iid=3)
-    entity.miot_device = SimpleNamespace(action_async=AsyncMock(return_value=[]))
+    entity.miot_device = SimpleNamespace(
+        action_async=AsyncMock(return_value=[]))
     register_action(action_service, entity)
 
     with pytest.raises(
