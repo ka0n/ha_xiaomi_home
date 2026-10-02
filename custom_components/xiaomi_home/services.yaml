@@ -1,10 +1,8 @@
 execute_action:
+  target:
+    entity:
+      integration: xiaomi_home
   fields:
-    entity_id:
-      required: true
-      selector:
-        entity:
-          integration: xiaomi_home
     params:
       required: false
       default: []
