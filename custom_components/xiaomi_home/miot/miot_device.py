@@ -1538,6 +1538,32 @@ class MIoTEventEntity(Entity):
         self.async_write_ha_state()
 
 
+def format_action_params(
+    action: MIoTSpecAction, params: list[Any]
+) -> list[dict]:
+    """Validate and format ordered MIoT action input parameters."""
+    if len(params) != len(action.in_):
+        raise ValueError(
+            f'expected {len(action.in_)} action parameters, got {params}')
+
+    result: list[dict] = []
+    for index, prop in enumerate(action.in_):
+        value = params[index]
+        if prop.format_ == str and isinstance(value, (bool, int, float, str)):
+            result.append({'piid': prop.iid, 'value': str(value)})
+        elif prop.format_ == bool and isinstance(value, (bool, int)):
+            result.append({'piid': prop.iid, 'value': bool(value)})
+        elif prop.format_ == float and isinstance(value, (int, float)):
+            result.append({'piid': prop.iid, 'value': value})
+        elif prop.format_ == int and isinstance(value, int):
+            result.append({'piid': prop.iid, 'value': value})
+        else:
+            raise ValueError(
+                f'invalid value for {prop.name}: expected '
+                f'{prop.format_.__name__}, got {type(value).__name__}')
+    return result
+
+
 class MIoTActionEntity(Entity):
     """MIoT Action Entity."""
     # pylint: disable=unused-argument
