@@ -1,0 +1,10 @@
+execute_action:
+  target:
+    entity:
+      integration: xiaomi_home
+  fields:
+    params:
+      required: false
+      default: []
+      selector:
+        object:
