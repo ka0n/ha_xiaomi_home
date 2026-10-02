@@ -82,6 +82,7 @@ async def async_setup(hass: HomeAssistant, hass_config: dict) -> bool:
     hass.data[DOMAIN].setdefault('entities', {})
     for platform in SUPPORTED_PLATFORMS:
         hass.data[DOMAIN]['entities'][platform] = []
+    async_setup_services(hass)
     return True
 
 
