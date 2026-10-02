@@ -64,6 +64,7 @@ from .miot.const import (
 from .miot.miot_error import MIoTOauthError
 from .miot.miot_device import MIoTDevice
 from .miot.miot_client import MIoTClient, get_miot_instance_async
+from .services import async_setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -81,6 +82,7 @@ async def async_setup(hass: HomeAssistant, hass_config: dict) -> bool:
     hass.data[DOMAIN].setdefault('entities', {})
     for platform in SUPPORTED_PLATFORMS:
         hass.data[DOMAIN]['entities'][platform] = []
+    async_setup_services(hass)
     return True
 
 
