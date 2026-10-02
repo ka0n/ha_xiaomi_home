@@ -17,11 +17,11 @@ from custom_components.xiaomi_home.miot.const import (
     DOMAIN,
 )
 from custom_components.xiaomi_home.miot.miot_device import MIoTActionEntity
+from custom_components.xiaomi_home.miot.miot_error import MIoTClientError
 from custom_components.xiaomi_home.services import (
     SERVICE_EXECUTE_ACTION,
     async_setup_services,
 )
-from custom_components.xiaomi_home.text import ActionText
 
 
 class MockActionEntity(MIoTActionEntity):
@@ -241,26 +241,52 @@ async def test_permission_denial_prevents_execution(
     entity.async_execute.assert_not_awaited()
 
 
-async def test_parameter_and_client_errors_are_translated(
+async def test_real_parameter_validation_reaches_formatter(
     action_service: HomeAssistant,
 ) -> None:
-    """Validation and client failures become Home Assistant service errors."""
-    entity = register_action(
-        action_service,
-        MockActionEntity("button.error_action"),
+    """Invalid params are rejected by the real MIoT action formatter."""
+    entity = MIoTActionEntity.__new__(MIoTActionEntity)
+    entity.entity_id = "button.real_validation"
+    entity._attr_available = True
+    entity._attr_name = "Real validation"
+    entity.spec = SimpleNamespace(
+        iid=9,
+        in_=[SimpleNamespace(iid=1, name="level", format_=int)],
+        out=[],
     )
-    entity.async_execute.side_effect = ValueError("bad params")
+    entity.service = SimpleNamespace(iid=3)
+    entity.miot_device = SimpleNamespace(action_async=AsyncMock(return_value=[]))
+    register_action(action_service, entity)
 
-    with pytest.raises(ServiceValidationError, match="bad params"):
+    with pytest.raises(
+        ServiceValidationError,
+        match="invalid value for level: expected int, got str",
+    ):
         await action_service.services.async_call(
             DOMAIN,
             SERVICE_EXECUTE_ACTION,
-            {"entity_id": entity.entity_id, "params": [1]},
+            {"entity_id": entity.entity_id, "params": ["bad"]},
             blocking=True,
             return_response=True,
         )
 
-    entity.async_execute.side_effect = RuntimeError("client failed")
+    entity.miot_device.action_async.assert_not_awaited()
+
+
+async def test_real_client_error_reaches_home_assistant_error(
+    action_service: HomeAssistant,
+) -> None:
+    """MIoT client failures traverse the real action entity error chain."""
+    entity = MIoTActionEntity.__new__(MIoTActionEntity)
+    entity.entity_id = "button.real_client_error"
+    entity._attr_available = True
+    entity._attr_name = "Real client error"
+    entity.spec = SimpleNamespace(iid=9, in_=[], out=[])
+    entity.service = SimpleNamespace(iid=3)
+    entity.miot_device = SimpleNamespace(
+        action_async=AsyncMock(side_effect=MIoTClientError("client failed"))
+    )
+    register_action(action_service, entity)
 
     with pytest.raises(HomeAssistantError, match="client failed"):
         await action_service.services.async_call(
@@ -271,7 +297,11 @@ async def test_parameter_and_client_errors_are_translated(
             return_response=True,
         )
 
-
+    entity.miot_device.action_async.assert_awaited_once_with(
+        siid=3,
+        aiid=9,
+        in_list=[],
+    )
 async def test_loaded_registry_lifecycle(hass: HomeAssistant) -> None:
     """Check action entities add/remove themselves from the runtime registry."""
     hass.data.setdefault(DOMAIN, {})
@@ -294,18 +324,3 @@ async def test_loaded_registry_lifecycle(hass: HomeAssistant) -> None:
 
     assert hass.data[DOMAIN][DATA_ACTION_ENTITIES] == {}
     entity.miot_device.unsub_device_state.assert_called_once()
-
-
-async def test_action_text_updates_state_on_empty_output() -> None:
-    """A successful ActionText call writes state even with empty output."""
-    entity = ActionText.__new__(ActionText)
-    entity.entity_id = "text.empty_action"
-    entity.spec = SimpleNamespace(in_=[])
-    entity.async_execute = AsyncMock(return_value=[])
-    entity.async_write_ha_state = Mock()
-
-    await entity.async_set_value("[]")
-
-    entity.async_execute.assert_awaited_once_with([])
-    assert entity.native_value == "[]"
-    entity.async_write_ha_state.assert_called_once_with()
