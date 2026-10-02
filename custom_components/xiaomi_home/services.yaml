@@ -2,6 +2,11 @@ execute_action:
   target:
     entity:
       integration: xiaomi_home
+      domain:
+        - button
+        - notify
+        - text
+      multiple: false
   fields:
     params:
       required: false
